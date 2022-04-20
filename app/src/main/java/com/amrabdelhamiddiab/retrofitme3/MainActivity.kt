@@ -6,8 +6,10 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import com.amrabdelhamiddiab.retrofitme3.data.api.ApiHelper
 import com.amrabdelhamiddiab.retrofitme3.data.api.RetrofitBuilder
+import com.amrabdelhamiddiab.retrofitme3.data.model.User
 import com.amrabdelhamiddiab.retrofitme3.data.repository.MainRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,19 +26,30 @@ class MainActivity : AppCompatActivity() {
         textView = findViewById(R.id.textView)
         repository = MainRepository(ApiHelper(RetrofitBuilder.apiService))
         button.setOnClickListener {
-            getData()
+            registerUser()
         }
 
     }
 
     private fun getData() {
-        lifecycle.coroutineScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             val data = repository.getUsers()
             withContext(Dispatchers.Main) {
-                textView.text = data.name
+                textView.text = data
             }
           //  Log.d(TAG, data.toString())
 
+        }
+    }
+
+    private fun registerUser(){
+        lifecycleScope.launch(Dispatchers.IO){
+            val user = User(name = "Amy Amr_8", email = "amyAmr_8@gmail.com", password = "123456")
+          val token =   repository.registerUser(user)
+            withContext(Dispatchers.Main){
+                textView.text = token
+                Log.d(TAG, token)
+            }
         }
     }
 
